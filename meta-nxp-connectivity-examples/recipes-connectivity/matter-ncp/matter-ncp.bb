@@ -48,7 +48,7 @@ TARGET_CPU = "${@get_target_cpu(d)}"
 TARGET_ARM_ARCH = "${@get_arm_arch(d)}"
 TARGET_ARM_CPU = "${@get_arm_cpu(d)}"
 
-S = "${WORKDIR}/git"
+# S = "${WORKDIR}/git"
 
 do_configure() {
     cd ${S}/
