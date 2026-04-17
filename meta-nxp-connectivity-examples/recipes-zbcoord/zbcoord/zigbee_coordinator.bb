@@ -18,7 +18,7 @@ python() {
     d.setVar("MY_HTTPS_PROXY", https_proxy)
 }
 
-S = "${WORKDIR}/git"
+# S = "${WORKDIR}/git"
 
 inherit cmake
 
