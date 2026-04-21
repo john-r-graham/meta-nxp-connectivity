@@ -24,6 +24,7 @@ inherit cmake
 
 DEPENDS += " mbedtls "
 RDEPENDS:${PN} += " mbedtls "
+CFLAGS:append = " -std=gnu17"
 
 do_configure() {
     local http_proxy="${MY_HTTP_PROXY}"
