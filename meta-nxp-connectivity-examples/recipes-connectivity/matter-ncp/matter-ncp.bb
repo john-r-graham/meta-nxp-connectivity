@@ -17,6 +17,14 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 DEPENDS += " gn-native ninja-native avahi dbus-glib-native pkgconfig-native boost python3-pip-native python3-packaging python3-click libusb "
 RDEPENDS_${PN} += " libavahi-client boost boost-dev boost-staticdev libusb "
 FILES:${PN} += "usr/share"
+# LDFLAGS:append = " -Wl,-z,nogcs"
+
+# JRG Band-Aid:
+# matter-ncp targets Cortex-A53 (ARMv8.0) which has no GCS hardware support.
+# Strip -mbranch-protection=standard to prevent GCC 15 from auto-injecting
+# -z gcs at link time, which libcrypto.so cannot satisfy.
+TARGET_CC_ARCH:remove = "-mbranch-protection=standard"
+TUNE_CCARGS:remove = "-mbranch-protection=standard"
 
 INSANE_SKIP:${PN} += "dev-so debug-deps strip"
 
