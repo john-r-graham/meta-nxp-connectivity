@@ -1,4 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+KERNEL_DTS += "imx93-11x11-evk-lpuart5-bt-115200-ffu-gpio-irq.dts"
 
 def get_arm_arch(d):
     for arg in (d.getVar('TUNE_FEATURES') or '').split():
@@ -13,14 +14,3 @@ SRC_URI += "file://patches/Disable-Power-Save-mode-for-BT.patch"
 
 SRC_URI += "${@get_arm_arch(d)}"
 
-do_patch:append() {
-    echo "Starting to copy DTS files after patching."
-    if [ -n "${DTS_FILE}" ]; then
-        for i in ${DTS_FILE}; do
-            if [ -f ${i} ]; then
-                echo "Copying ${i} to ${S}/arch/arm64/boot/dts/freescale"
-                cp ${i} ${S}/arch/arm64/boot/dts/freescale/
-            fi
-        done
-    fi
-}
