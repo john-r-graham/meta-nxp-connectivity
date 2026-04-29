@@ -13,4 +13,4 @@ PATCHTOOL = "git"
 inherit autotools
 EXTRA_OEMAKE += 'CFLAGS+="-DHAVE_CONFIG_H"'
 
-S = "${WORKDIR}/git"
+# S = "${WORKDIR}/git"
