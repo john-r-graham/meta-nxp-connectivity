@@ -23,6 +23,6 @@ include iw612_otbr_src_rev_opts_patches.inc
 SRC_URI += "file://0002-copy-prebuilt-frontend-files-instead-of-build.patch"
 
 EXTRA_OECMAKE += " -DCMAKE_CXX_FLAGS="${CXXFLAGS}"" -Wno-error=attributes""" -DOTBR_WEB=ON "
-BIN_NAME_PATTERN="-iwxxx"
+BIN_NAME_PATTERN = "-iwxxx"
 
 INSANE_SKIP:${PN} += "buildpaths"
