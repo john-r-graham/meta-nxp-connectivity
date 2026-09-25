@@ -22,6 +22,11 @@ SRCREV = "3ba9b874aea8088ec6a3d80cd7faa9584622b7a5"
 # Add "hello" Zigbee new application
 SRC_URI += "file://0001-Add-new-hello-Zigbee-application.patch"
 
+# JRG: NXP's Zigbee test script references the zb_mux executable at the wrong path.
+do_configure:append() {
+    sed -i 's|\./zb_mux|/usr/sbin/zb_mux|g' ${S}/scripts/imx-dualpan.sh
+}
+
 INSANE_SKIP:${PN} += "already-stripped"
 do_install:append() {
     install -d ${D}${libdir}
