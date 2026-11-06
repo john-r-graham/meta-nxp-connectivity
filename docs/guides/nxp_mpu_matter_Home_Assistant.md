@@ -1,16 +1,16 @@
 # Running Matter Commissioning in Home Assistant application on i.MX MPU platforms
 
-The [Home Assistant](https://www.home-assistant.io/) (HA) application runs on both Android and iOS systems. By deploying the Home Assistant and Matter Server Docker containers on the i.MX MPU platform, you can use the HA application on the phone to manage Matter devices intuitively and easily. This document shows how to deploy the Home Assistant and Matter Server Docker containers on i.MX MPU platforms and then shows how to commission i.MX Matter devices in the HA application.
+The [Home Assistant](https://www.home-assistant.io/) (HA) application runs on both Android and iOS systems. Deploying the Home Assistant and Matter Server Docker containers on the i.MX MPU platform enables Matter device management through the Home Assistant mobile app using an intuitive graphical interface. This document explains how to deploy the Home Assistant and Matter Server Docker containers on i.MX MPU platforms and commission i.MX Matter devices in Home Assistant.
 
  [**Overview**](#overview)
 
  [**Deploying the Docker containers on the i.MX MPU platform**](#deploy-docker)
 
- [**Running the Home Assistant application on the Phone**](#running-app)
+ [**Running the Home Assistant application on the phone**](#running-app)
 
  [**Commissioning the i.MX Matter device on Home Assistant application**](#commissioning-with-phone)
 
- [**Known issue**](#known-issue)
+ [**Known issues**](#known-issue)
 
  [**FAQ**](#faq)
 
@@ -28,11 +28,11 @@ Figure. HA schematic diagram for i.MX MPU platform
 
 ## Deploying the Docker containers on the i.MX MPU platform
 
-### i.MX 91 FRDM pre-deployment steps
+### i.MX 91 FRDM predeployment steps
 
-To run HA on the i.MX 91 FRDM, please flash the i.MX 91 FRDM Matter Yocto image to an SD card with a capacity of at least 16 GB and boot the board from the SD card. Before downloading and deploying the Home Assistant and Matter Server Docker images on the i.MX 91 FRDM, please perform the following two steps. ___If you are using other platforms, you can skip this section and directly move on to deploying the Docker containers in the next section.___
+To run HA on the i.MX 91 FRDM, flash the i.MX 91 FRDM Matter Yocto image to an SD card with a capacity of at least 16 GB and boot the board from the SD card. Before downloading and deploying the Home Assistant and Matter Server Docker images on the i.MX 91 FRDM, perform the following two steps. ___If you are using other platforms, skip this section and directly deploy the Docker containers in the next section.___
 
-Step 1. Create a new partition to store the Docker images.
+Step 1. To store the Docker images, create a partition.
 
     root@imx91frdm-iwxxx-matter:~# fdisk /dev/mmcblk1
 
@@ -87,7 +87,7 @@ Step 1. Create a new partition to store the Docker images.
         Creating journal (65536 blocks): done
         Writing superblocks and filesystem accounting information: done
 
-Step 2. Mount the new partition to the "~/image" folder and restart the docker service using the commands below.
+Step 2. Mount the new partition to the "~/image" folder and restart the Docker service using the commands below.
 
     root@imx91frdm-iwxxx-matter:~# mkdir image
     root@imx91frdm-iwxxx-matter:~# mount /dev/mmcblk1p3 image
@@ -104,9 +104,9 @@ Step 2. Mount the new partition to the "~/image" folder and restart the docker s
 
 ### Deploying the Docker containers on all supported i.MX MPU Platforms
 
-Download and deploy the homeassistant and matter-server Docker images.
+Download and deploy the Home Assistant and matter-server Docker images.
 
-    $ docker run -d --name homeassistant --privileged --restart=unless-stopped -e TZ=MY_TIME_ZONE -v $(pwd)/config:/config -v /run/dbus:/run/dbus:ro --network=host ghcr.io/home-assistant/home-assistant:2026.3
+    $ docker run -d --name homeassistant --privileged --restart=unless-stopped -e TZ=MY_TIME_ZONE -v $(pwd)/config:/config -v /run/dbus:/run/dbus:ro --network=host ghcr.io/home-assistant/home-assistant:2026.9
     $ docker run -d --name matter-server --restart=unless-stopped --security-opt apparmor=unconfined -v $(pwd)/data:/data --network=host ghcr.io/home-assistant-libs/python-matter-server:8.1.0 --storage-path /data --paa-root-cert-dir /data/credentials
 
 It takes a few minutes to download and deploy the images. You can check the images by running "$ docker image" after the deployment is complete.
@@ -115,13 +115,13 @@ It takes a few minutes to download and deploy the images. You can check the imag
                                                                                                         i Info    U  In Use
     IMAGE                                                    ID             DISK USAGE   CONTENT SIZE   EXTRA
     ghcr.io/home-assistant-libs/python-matter-server:8.1.0   170aa093ce91        644MB          144MB    U
-    ghcr.io/home-assistant/home-assistant:2026.3             916682086154        3.3GB          597MB    U
+    ghcr.io/home-assistant/home-assistant:2026.9             3e6710a7ab2a       3.39GB          633MB    U
 
 <a name="running-app"></a>
 
-## Running the Home Assistant application on the Phone
+## Running the Home Assistant application on the phone
 
-Before running the HA application, you need to perform some environmental configuration.
+Before running the HA application, perform some environment configurations.
 First, you can use the commands below to connect to the Wi-Fi AP on the i.MX Docker device and check its IP address.
 
     $ wpa_passphrase ${SSID} ${PASSWORD} > wifiap.conf
@@ -135,25 +135,25 @@ First, you can use the commands below to connect to the Wi-Fi AP on the i.MX Doc
 
     $ ifconfig mlan0       # check IP address
 
-If you need to commission a Thread device in HA, [setup OTBR on the i.MX Docker device](./nxp_mpu_matter_demos.md#running-matter-demos-with-otbr-and-openthread-on-the-imx-mpu-platform).
+To commission a Thread device in HA, [setup OTBR on the i.MX Docker device](./nxp_mpu_matter_demos.md#running-matter-demos-with-otbr-and-openthread-on-the-imx-mpu-platform).
 
 Then, connect to the same Wi-Fi AP, enable Bluetooth on your phone, and open the HA app on your phone and configure the HA server URL.
 
-If you are a new user of this application, you can set the URL when you log in to this application. Enter the URL and click the "Connect" button. The URL should be in the format  `http://<IP_ADDRESS>:8123 `, where <IP_ADDRESS> is the IP address of your i.MX device.
+If you are a new user of this application, you can set the URL when you log in to this application. Enter the URL and click the "Connect" button. The URL must be in the format  `http://<IP_ADDRESS>:8123 `, where <IP_ADDRESS> is the IP address of your i.MX device.
 
  <img src="../images/home_assistant_demo/config-url_newuser.png" width = "200"/>
 
 Figure. Configuring the Home Assistant server URL when logging in
 
-Or you can configure the URL in the settings according to the below steps, click the "SETTINGS", "Home", "Home Assistant URL" buttons in sequence on the following page to update the URL.
+Or you can configure the URL in the settings according to the steps below, click the "SETTINGS", "Home", "Home Assistant URL" buttons in sequence on the following page to update the URL.
 
 <img src="../images/home_assistant_demo/config-url_1.png" width = "200"/> <img src="../images/home_assistant_demo/config-url_2.png" width = "200"/> <img src="../images/home_assistant_demo/config-url_3.png" width = "200"/>
 
 Figure. Configuring the Home Assistant server URL in Settings
 
-Once you have connected the Home Assistant server, you should integrate the Python Matter server to communicate with the i.MX Matter device. You will also need to integrate the Thread and OpenThread Border Router server if you need to commission the Matter Thread device.
+Once you have connected to the Home Assistant server, integrate the Python Matter server to communicate with the i.MX Matter device. Also integrate the Thread and OpenThread Border Router server to commission the Matter Thread device.
 
-Integrate the Python Matter server into the Phone application:
+Integrate the Python Matter server into the phone application:
 
 Click "Setting" – "Devices & services" – "+ Add integration" at the bottom-right corner – search for "Matter" – select the "Matter" – enter URL "ws://localhost:5580/ws" – "Submit" to integrate Python Matter Server.
 
@@ -169,9 +169,9 @@ Click "Setting" – "Devices & services" – "+ Add integration" at the bottom-r
 
 Figure. Integrate the Thread service
 
-Integrate the Open Thread Border Router REST API into HA instance:
+Integrate the Open Thread Border Router REST API into the HA instance:
 
-Click "Setting" – "Devices & services" – "+ Add integration" at the bottom-right corner - search for "Open Thread Border Router" - select the "Open Thread Border Router" – Enter URL "http://ip:8081" (IP is the otbr-agent device's IP, it uses 8081 port for REST API by default) – Submit, the Open Thread Border Router REST API will add into HA instance.
+Click "Setting" – "Devices & services" – "+ Add integration" at the bottom-right corner.- Search for "Open Thread Border Router". - Select the "Open Thread Border Router" – Enter URL "http://ip:8081" (IP is the otbr-agent device's IP, it uses 8081 port for REST API by default). – Submit, the Open Thread Border Router REST API is added into the HA instance.
 
 <img src="../images/home_assistant_demo/config-otbr_1.png" width = "200"/><img src="../images/home_assistant_demo/config-otbr_2.png" width = "200"/>
 
@@ -180,21 +180,21 @@ Figure. Integrate the Thread Border Router
 Set the preferred network and sync Thread credentials.
 
 Go to "Setting" - "Devices & services" - "Thread" - click the configuration logo - set or check the right border router as the preferred network.
-Then, go to "Setting" – "Companion app" – "Troubleshooting" – "Sync Thread credentials" to Sync the credentials.
+Then, go to "Setting" – "Companion app" – "Troubleshooting" – "Sync Thread credentials" to sync the credentials.
 
 <img src="../images/home_assistant_demo/config-otbr_3.png" width = "200"/><img src="../images/home_assistant_demo/config-otbr_4.png" width = "200"/>
 
-Figure. Setting the preferred network and sync the Thread credentials.
+Figure. Setting the preferred network and syncing the Thread credentials.
 
 <a name="commissioning-with-phone"></a>
 
-## Commissioning the i.MX Matter device on Home Assistant application
+## Commissioning i.MX Matter device on Home Assistant application
 
-This chapter shows how to commission an i.MX Matter device on HA application.
+This chapter shows how to commission an i.MX Matter device on the HA application.
 
-First, set up the i.MX Matter device. There are two ways to run the Matter application. Take the chip-lighting-app as an example. You can also setup the Matter application on a Thread device.
+First, set up the i.MX Matter device. There are two ways to run the Matter application. Take the chip-lighting-app as an example. You can also set up the Matter application on a Thread device.
 
-Run the commands below if the i.MX Matter device is i.MX 93 or i.MX 91 to enable the ELE. For other boards, proceed to Option 1 or Option 2.
+If the i.MX Matter device is an i.MX 93 or i.MX 91, run the commands below to enable the ELE. For other boards, proceed to Option 1 or Option 2.
 
     $ systemctl enable nvm_daemon
     $ systemctl start nvm_daemon
@@ -219,13 +219,13 @@ Option 2
     $ modprobe moal mod_para=nxp/wifi_mod_para.conf
     $ modprobe btnxpuart
     $ hciconfig hci0 up
-    $ chip-lighting-app --wifi --ble-device 0
+    $ chip-lighting-app --wifi --ble-controller 0
 
-After running the chip-lighting-app, you will find a log line similar to the one below, copy the URL and open it in a browser, you can see the QR code of this Matter application.
+After running the chip-lighting-app, find a log line similar to the one below. Copy the URL and open it in a browser to see the QR code of this Matter application.
 
     CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
 
-Then, you can commission i.MX Matter application as shown in the following pictures. Click the "Settings", "Devices & services", "+ Add integration", "Add Matter device", "No, it's new.", "Open camera here" buttons in sequence on the following pages to start scanning the QR code of the i.MX Matter application.
+Then, you can commission the i.MX Matter application as shown in the following pictures. Click the "Settings", "Devices & services", "+ Add integration", "Add Matter device", "No, it's new", "Open camera here" buttons in sequence on the following pages and start scanning the QR code of the i.MX Matter application.
 
 <img src="../images/home_assistant_demo/app_1.png" width = "200"/> <img src="../images/home_assistant_demo/app_2.png" width = "200"/> <img src="../images/home_assistant_demo/app_3.png" width = "200"/> <img src="../images/home_assistant_demo/app_4.png" width = "200"/> <img src="../images/home_assistant_demo/app_5.png" width = "200"/> <img src="../images/home_assistant_demo/app_6.png" width = "200"/>
 
@@ -241,7 +241,7 @@ Once the device has been successfully connected, you are able to control it.
 
 <a name="known-issue"></a>
 
-## Known issue
+## Known issues
 
 - When commissioning with the chip-all-cluster-app, you may encounter a "Something went wrong" error in the final steps of the commissioning process on the Home Assistant app. This is a known issue related to the Home Assistant Docker environment.
 
@@ -251,7 +251,7 @@ Once the device has been successfully connected, you are able to control it.
 
 ### What to do if the download fails or the download speed of the Docker image is slow?
 
-The download failure or slow download speed may be caused by network issues. Use the following commands to set the proxies for the Docker service. Then retry to download and deploy the Docker image again.
+The download failure or slow download speed may be caused by network issues. Use the following commands to set the proxies for the Docker service. Then try to download and deploy the Docker image again.
 
     $ mkdir /etc/systemd/system/docker.service.d
     $ vi /etc/systemd/system/docker.service.d/http-proxy.conf
@@ -265,14 +265,14 @@ The download failure or slow download speed may be caused by network issues. Use
 
 ### What to do if the commissioning fails?
 
-Check the status of the Docker service, and the network status and the status of the Bluetooth interface.
+Check the status of the Docker service, the network, and the Bluetooth interface.
 
     $ systemctl status docker    # check the Docker service status
     $ systemctl start docker     # start the Docker service
     $ ifconfig mlan0             # check the Network status
     $ hciconfig hci0             # check the Bluetooth status
 
-You need to make sure that the Docker service is active, an IP has been assigned to the mlan0 interface, and that hci0 is up and running.
+Ensure that the Docker service is active, an IP has been assigned to the mlan0 interface, and that hci0 is up and running.
 
         root@imx93evk-iwxxx-matter:~# systemctl status docker
         * docker.service - Docker Application Container Engine
@@ -312,7 +312,7 @@ If the device is connected to a network cable, use the following command to turn
 
 ### What to do if the commissioning fails with matter-server logs "CHIP_ERROR [chip.native.DIS] Timeout waiting for mDNS resolution."?
 
-When commissioning device over BLE or IP failures occur, especially when OTBR is set up. You need to check the matter-server container's logs by "$ docker logs matter-server", if the logs include "CHIP_ERROR [chip.native.DIS] Timeout waiting for mDNS resolution", you can try to resolve this issue by running below commands to clear avahi cache then retry the commissioning process.
+When commissioning a device over Bluetooth Low Energy or IP failures occur, especially when OTBR is set up. Check the matter-server container logs by "$ docker logs matter-server", if the logs include "CHIP_ERROR [chip.native.DIS] Timeout waiting for mDNS resolution", you can try to resolve this issue by running the commands below to clear avahi cache then retry the commissioning process.
 
 	$ sudo systemctl stop avahi-daemon
 	$ sudo rm -rf /var/run/avahi-daemon/*
@@ -321,6 +321,6 @@ When commissioning device over BLE or IP failures occur, especially when OTBR is
 
 ### What should be done when an attempt to add the OpenThread Border Router's REST API fails with a 'Failed to connect' error?
 
-Add the option "--rest-listen-address 0.0.0.0" when starting otbr-agent or otbr-agent-iwxxx, for example:"
+Add the option "--rest-listen-address 0.0.0.0" when starting otbr-agent or otbr-agent-iwxxx, for example:
 
 	$ otbr-agent-iwxxx -I wpan0 -B mlan0 --rest-listen-address 0.0.0.0 spinel+spi:///dev/spidev0.0?gpio-reset-device=/dev/gpiochip5&gpio-int-device=/dev/gpiochip4&gpio-int-line=10&gpio-reset-line=1&spi-mode=0&spi-speed=1000000&spi-reset-delay=0

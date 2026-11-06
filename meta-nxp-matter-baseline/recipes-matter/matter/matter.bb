@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 
 inherit pkgconfig
 
-SRCBRANCH = "v1.6-branch-imx_matter_2026_q2"
+SRCBRANCH = "v1.7-branch-imx_matter_2026_q3"
 IMX_MATTER_SRC ?= "git://github.com/NXP/matter.git;protocol=https"
 SRC_URI = "${IMX_MATTER_SRC};branch=${SRCBRANCH}"
 SRC_URI:append = " \
@@ -17,25 +17,28 @@ MATTER_PY_PATH ?= "${STAGING_BINDIR_NATIVE}/python3-native/python3"
 
 PATCHTOOL = "git"
 
-SRCREV = "05bb641b7eda8910685a70b142e58d15739e2364"
+SRCREV = "c5d49e222fd6bd14905dcaa9176c697acdb57f0c"
 
 BB_ENV_PASSTHROUGH_ADDITIONS:append = " http_proxy https_proxy no_proxy HTTP_PROXY HTTPS_PROXY NO_PROXY"
 
 do_checkout_submodules() {
-    export http_proxy="${@d.getVar('http_proxy') or d.getVar('HTTP_PROXY') or ''}"
-    export https_proxy="${@d.getVar('https_proxy') or d.getVar('HTTPS_PROXY') or ''}"
-    export no_proxy="${@d.getVar('no_proxy') or d.getVar('NO_PROXY') or ''}"
-    export HTTP_PROXY="${http_proxy}"
-    export HTTPS_PROXY="${https_proxy}"
-    export NO_PROXY="${no_proxy}"
-
+    # Proxy vars come from the passthrough environment (see
+    # BB_ENV_PASSTHROUGH_ADDITIONS above) and are already present in the
+    # task's runtime shell environment. Do NOT expand them from the
+    # datastore (${@d.getVar(...)} / ${http_proxy}) here: doing so bakes
+    # their values into the task signature and caused non-deterministic
+    # basehash errors when the proxy environment differed between parses.
     cd ${S}
     ${S}/scripts/checkout_submodules.py --force --recursive --deinit-unmatched --platform imx
 }
+# Proxy vars are environment/network settings, not build inputs — exclude
+# them from this task's signature so they do not cause non-deterministic
+# basehash values across parses with differing proxy environments.
+do_checkout_submodules[vardepsexclude] = "http_proxy https_proxy no_proxy HTTP_PROXY HTTPS_PROXY NO_PROXY"
 addtask checkout_submodules after do_unpack before do_patch
 
 TARGET_CC_ARCH += "${LDFLAGS}"
-DEPENDS += " gn-native ninja-native avahi dbus-glib-native pkgconfig-native boost python3-pip-native python3-packaging-native python3-click-native openssl  matter-idl-native python3-jinja2-native python3-lark-native python3-setuptools-native python3-python-path-native "
+DEPENDS += " gn-native ninja-native avahi dbus-glib-native pkgconfig-native boost python3-pip-native python3-packaging-native python3-click-native openssl  matter-idl-native python3-jinja2-native python3-lark-native python3-setuptools-native python3-python-path-native protobuf-native python3-protobuf-native "
 RDEPENDS_${PN} += " libavahi-client boost boost-dev boost-staticdev openssl "
 FILES:${PN} += "usr/share"
 
